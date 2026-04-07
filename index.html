@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTMLOptimizer - HTML代码优化器</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;}
+.app{max-width:1000px;margin:0 auto;padding:20px;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.5em;} .header h1 span{color:#22d3ee;}
+textarea{width:100%;min-height:250px;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#e2e8f0;padding:12px;font-family:'Courier New',monospace;font-size:13px;resize:vertical;}
+textarea:focus{outline:none;border-color:#22d3ee;}
+.btn{padding:12px 24px;background:#22d3ee;color:#000;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;margin:8px 8px 8px 0;}
+.stats{display:flex;gap:20px;padding:12px;background:#1e293b;border-radius:8px;margin-top:8px;font-size:14px;}
+.stats span{color:#64748b;}
+.stats strong{color:#22d3ee;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header"><h1>HTML<span>Optimizer</span></h1></div>
+  
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div style="background:#1e293b;border-radius:12px;padding:20px;">
+      <textarea id="input" placeholder="粘贴HTML代码..."><div class="container">
+  <h1>Hello World</h1>
+  <p>This is a paragraph.</p>
+</div></textarea>
+    </div>
+    <div style="background:#1e293b;border-radius:12px;padding:20px;">
+      <textarea id="output" readonly placeholder="优化后的代码..."></textarea>
+    </div>
+  </div>
+  
+  <button class="btn" onclick="optimize()">优化</button>
+  <button class="btn" onclick="copy()">复制</button>
+  <button class="btn" onclick="document.getElementById('input').value='';document.getElementById('output').value=''">清空</button>
+  
+  <div class="stats" id="stats" style="display:none">
+    <span>原始大小: <strong id="orig">0</strong>B</span>
+    <span>优化后: <strong id="opt">0</strong>B</span>
+    <span>节省: <strong id="saved">0</strong>%</span>
+  </div>
+</div>
+
+<script>
+function optimize() {
+  let html = document.getElementById('input').value;
+  const origSize = new Blob([html]).size;
+  
+  // Remove comments
+  html = html.replace(/<!--[\s\S]*?-->/g, '');
+  
+  // Remove unnecessary whitespace
+  html = html.replace(/>\s+</g, '><');
+  html = html.replace(/\s{2,}/g, ' ');
+  html = html.replace(/\n\s*/g, '');
+  
+  // Remove optional closing tags (simplified)
+  html = html.replace(/<\/div>/g, '');
+  html = html.replace(/<\/span>/g, '');
+  html = html.replace(/<\/p>/g, '');
+  html = html.replace(/<\/li>/g, '');
+  
+  // Trim
+  html = html.trim();
+  
+  document.getElementById('output').value = html;
+  
+  const optSize = new Blob([html]).size;
+  const saved = origSize > 0 ? Math.round((1 - optSize / origSize) * 100) : 0;
+  
+  document.getElementById('stats').style.display = 'flex';
+  document.getElementById('orig').textContent = origSize;
+  document.getElementById('opt').textContent = optSize;
+  document.getElementById('saved').textContent = saved + '%';
+}
+
+function copy() {
+  navigator.clipboard.writeText(document.getElementById('output').value);
+}
+
+optimize();
+</script>
+</body>
+</html>
